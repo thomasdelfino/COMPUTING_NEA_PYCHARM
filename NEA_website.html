@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+  <title>Computing NEA webpage</title>
+
+  <link rel="stylesheet" href="css_practice.css">
+
+<script src="NEA_javascript.js"></script>
+
+</head>
+
+
+
+
+
+
+<body>
+
+<!-- NAVIGATION BAR -->
+
+<div class="topnav">
+	<a class="active" href="#home">EEG sleep state predictor</a>
+	<a href="#information">Helpful information</a>
+	<a href="#links">Useful links</a>
+	<a href="#biography">Biography</a>
+
+
+        <a href="#light_mode"> <button id="lightmode_button" type="submit" onclick="toggle_lightmode()">Light Mode</button></a>
+
+</div>
+
+<!-- NAVIGATION BAR -->
+
+
+
+
+
+<!-- INPUT AREA -->
+<div class="input">
+
+<h1>Discover your sleep quality today.</h1>
+<p> Please enter your EEG file here by clicking the button: </p>
+
+
+<!-- from AI replace!!!! -->
+<form action="/predict" method="POST" enctype="multipart/form-data">
+	<input type="file" name="userFile" class="file-input-area">
+		<br>
+		<button type="submit">Submit!</button>
+		</br>
+</form>
+
+<!-- from AI may not work!!!! -->
+
+
+</div>
+
+
+
+<!-- INPUT AREA -->
+
+
+
+
+<!-- OUTPUT AREA -->
+
+<div class="box">
+  <div class="output">
+  <p>Your results will appear here: </p>
+    <div class="brain">
+	<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVyY25NJZCEey5ZUC7SCOXExjvMxCTylgqA-OHGCcOnWmbN-ZNXF0uSZeM&s=10" alt="Template">
+    </div>
+  </div>
+</div>
+<!-- OUTPUT AREA -->
+
+
+<!-- WARNING CAN REMOVE! PERSONAL DETAILS to increase complexity -->
+<div class="box">
+  <div class="personal_details">
+
+<form>
+  <label for="age">Enter your age: </label><br>
+  <input type="text" id="personal_data_age" name="personal_data_age"><br>
+
+  <label for="sex">Enter your sex: </label><br>
+  <input type="text" id="personal_data_sex" name="personal_data_sex"><br>
+
+  <label for="sex">Would you describe yourself as a morning person or a night owl? </label><br>
+  <input type="text" id="personal_data_chronotype" name="personal_data_chronotype"><br>
+
+  <label for="sex">Do you use your phone / social media late at night? </label><br>
+  <input type="text" id="personal_data_technology" name="personal_data_technology"><br>
+<form>
+
+
+<h2> How your data is handled</h2>
+<p>This website operates with a strict data security policy, no data is stored or sold to third parties. Adding extra information may be useful as it can allow for more precise results</p>
+
+  </div>
+</div>
+
+<!-- PERSONAL DETAILS -->
+
+
+
+
+<!-- INFORMATION -->
+<div class="box">
+  <div class="information" id="information">
+
+  <h2>How do I use the EEG Brain State Predictor?</h2>
+
+  <p>The model allows you to view quantitatively how well you slept the night before, enabling our users to more deeply understand how to get to sleep. Simply enter your EEG file from your headset your results will be generated in seconds. </p>
+
+  <h2>How do I understand my results?</h2>
+
+  <p>Our model allows you to classify 5 sleep stages: Awake, NREM Sleep Stage 1, NREM Sleep Stage 2, NREM Sleep Stage 3/4, and REM sleep. REM stands for Rapid Eye Movement and marks the period of main dreaming activity, characterised by full body paralysis excluding the eyes which move frequently. </p>
+
+  <h2>Sample question 1</h2>
+
+  <p> sample answer 1 </p>
+
+  <h2>Sample question 1</h2>
+
+  <p> sample answer 1 </p>
+
+  <h2>Sample question 1</h2>
+
+  <p> sample answer 1 </p>
+
+
+  </div>
+</div>
+<!-- INFORMATION -->
+
+
+
+
+
+<!-- USEFUL LINKS -->
+<div class="box">
+<div class="links" id="links">
+
+<h2>Want to learn more? Here are some useful links to guide you along your sleep journey: </h2>
+
+<a href="https://www.nhs.uk/every-mind-matters/mental-health-issues/sleep/" target="_blank"> NHS link </a><br>
+
+<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVyY25NJZCEey5ZUC7SCOXExjvMxCTylgqA-OHGCcOnWmbN-ZNXF0uSZeM&s=10" alt="Template">
+
+<p>The NHS provides ways to identify whether you are getting enough sleep. If frustration with sleep continues, consider seeking an appointment with your GP</p> <br>
+
+
+
+
+<a href="https://www.sleepfoundation.org/sleep-hygiene/healthy-sleep-tips" target="_blank"> Sleep hygiene </a><br>
+
+<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVyY25NJZCEey5ZUC7SCOXExjvMxCTylgqA-OHGCcOnWmbN-ZNXF0uSZeM&s=10" alt="Template">
+
+<p>The Sleep Foundation is an information platform which provides expert advice, evidence based sleep insights and product reviews on sleep products</p> <br>
+<br>
+
+
+
+<a href="https://www.thesleepcharity.org.uk/" target="_blank"> The Sleep Charity </a><br>
+
+<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVyY25NJZCEey5ZUC7SCOXExjvMxCTylgqA-OHGCcOnWmbN-ZNXF0uSZeM&s=10" alt="Template">
+
+<p>The Sleep Foundation is an information platform which provides expert advice, evidence based sleep insights and product reviews on sleep products</p> <br>
+
+
+<h2>Academic papers</h2>
+<p>For those who want to read deeper</p> <br>
+
+<p> The Extraordinary Importance of Sleep </p>
+
+
+</div>
+</div>
+<!-- USEFUL LINKS -->
+
+
+
+
+
+<!-- Biography -->
+<div class="box">
+<div class="biography" id="biography">
+
+<h2>Biography</h2>
+<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVyY25NJZCEey5ZUC7SCOXExjvMxCTylgqA-OHGCcOnWmbN-ZNXF0uSZeM&s=10" alt="Template">
+
+<p>Hi, I am Thomas Delfino, creator of EEG Sleep State predictor. I believe that sleep is an important part of all of our lives. We spend 1/3 of our lives asleep, we might as well make it count.</p>
+
+</div>
+</div>
+<!-- Biography -->
+
+
+
+</body>
+
+</html>
+
+
+

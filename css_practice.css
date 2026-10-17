@@ -1,0 +1,216 @@
+/* Importing Fonts WARNING FROM AI*/
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300..900;1,300..900&display=swap');
+
+
+/* Global Variables */
+.light-mode {
+  --body-colour: #0B0F0D
+  --box-colour: 
+  --nav-bar-colour: 
+
+
+}
+
+.dark-mode {
+  --body-colour: #0B0F0D
+  --box-colour: #1E1E1E
+  --nav-bar-colour: #202124
+
+
+}
+
+
+
+/* ALL */
+
+html {
+  scroll-behavior: smooth;
+}
+
+h1 {
+  font-family: "Fraunces", serif;
+  font-size: 50px;
+}
+
+body {
+  background-color: #0B0F0D;
+  font-size: 20px;
+  color: #FFFFFF;
+
+}
+
+p {
+  font-family: "Fraunces", serif;
+  
+}
+
+a {
+  color: #FFFFFF
+}
+
+.box {
+  margin-left: 5%;
+  margin-right: 5%;
+  margin-bottom: 80px;
+  background-color: #1E1E1E;
+  padding: 25px; 
+  border-radius: 16px;
+}
+
+
+
+
+
+/* Navigation Bar */
+
+.topnav {
+  background-color: #202124;
+  overflow: hidden;
+  border: 1px solid #474646;
+  position: sticky;
+  top: 0;
+  z-index: 1000; 		/* This lets it go infront of the images */
+}
+
+.topnav a {
+  float: left;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 16px 16px;
+  text-decoration: none;
+  font-size: 26px
+}
+
+.topnav a.active {
+  background-color: DarkBlue;
+  color: white;
+}
+
+.topnav button {
+  float: right;
+  background-color: #0B0F0D; 
+  color: #FFFFFF;
+  font-size: 16px;
+  border-radius: 15px;
+  padding: 5px;
+}
+
+
+
+/* INPUT AREA */
+.input {
+  margin-bottom: 300px;
+  background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR3UFwmnGoPnMoAO7XvdarjUA7gqgkle66PfBFt7HtD688m8dePXLJN9Qkv&s=10');
+
+
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+
+
+}
+
+.input form {
+  text-align: center;
+
+}
+
+
+.file-input-area {
+
+}
+
+.file-input-area::file-selector-button {
+  background-color: #0B0F0D; 
+  color: #FFFFFF;
+  font-size: 15px;
+  border-radius: 15px;
+  padding: 10px;
+  margin: 20px; 
+}
+
+.input button {
+  background-color: #0B0F0D; 
+  color: #FFFFFF;
+  font-size: 15px;
+  border-radius: 15px;
+  padding: 10px;
+  margin: 20px; 
+}
+
+
+
+/* OUTPUT AREA */
+.box output {
+  border: 5px;
+  border-color: #262C2A; /* border color is not working */
+
+  
+}
+
+
+
+.brain img {
+  border-radius: 16px;
+  width: 50%;
+  position: relative;
+  float: none;
+}
+
+
+
+/* PERSONAL DETAILS */
+
+.personal_details form {
+  text-align: left;
+}
+
+/* PERSONAL DETAILS */
+
+
+/* INFORMATION */
+.information {
+
+}
+
+/* INFORMATION */
+
+
+/* USEFUL LINKS */
+.links {
+}
+
+.links img {
+  border-radius: 16px;
+  width: 200px;
+  position: relative;
+  float: right;
+
+}
+
+/* USEFUL LINKS */
+
+
+/* BIOGRAPHY */
+
+.biography {
+}
+
+.biography img {
+  border-radius: 16px;
+  width: 300px;
+  position: relative;
+  float: none;
+}
+
+.biogarphy light-mode {
+  background-color: grey;
+  color: black;
+}
+
+
+/* BIOGRAPHY */
+
+
+
+
