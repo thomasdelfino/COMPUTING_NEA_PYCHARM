@@ -37,6 +37,8 @@ body {
   font-size: 20px;
   color: #FFFFFF;
 
+
+
 }
 
 p {
@@ -99,14 +101,12 @@ a {
 
 /* INPUT AREA */
 .input {
-  margin-bottom: 300px;
   background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR3UFwmnGoPnMoAO7XvdarjUA7gqgkle66PfBFt7HtD688m8dePXLJN9Qkv&s=10');
-
-
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
-
+  height: 75vh;
+  width: 100%;
 
 }
 
@@ -152,7 +152,7 @@ a {
 
 .brain img {
   border-radius: 16px;
-  width: 50%;
+  width: 40%;
   position: relative;
   float: none;
 }
@@ -182,7 +182,7 @@ a {
 
 .links img {
   border-radius: 16px;
-  width: 200px;
+  width: 250px;
   position: relative;
   float: right;
 
