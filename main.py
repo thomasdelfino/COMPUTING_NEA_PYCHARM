@@ -10,7 +10,7 @@ from mne.channels import make_standard_montage
 
 
 # Potential Approach 1
-from sklearn import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier
 
 
 
@@ -56,22 +56,28 @@ frequency_bands = {
 
 # Subroutines
 
-def loading_data(subject_num):
-    [subject_files] = fetch_data(subjects=[subject_num], recording=[1]) # Not sure what recording=[1] means
+def loading_data(subject_num, subject_index):
+    [subject_files] = fetch_data(subjects=[subject_num], recording=[2])  # Not sure what recording=[1] means
 
-    raw_local = mne.io.read_raw_edf(
-        subject_files[0], # 0th file, can change
+    raw_file = mne.io.read_raw_edf(
+        subject_files[subject_index],  # 0th file, can change
         stim_channel="Event marker",
         infer_types=True,
         preload=True,
         verbose="error"
-        )
+    )
 
     # Reading and setting the annotations
     annotations_local = mne.read_annotations(subject_files[1])
-    raw_local.set_annotations(annotations_local)
+    raw_file.set_annotations(annotations_local)
 
-    return raw_local, [subject_files], annotations_local
+    # Not all channels can be available to the user e.g. rectal temperature
+    raw_file.drop_channels(['horizontal'])
+    raw_file.drop_channels(['oro-nasal'])
+    raw_file.drop_channels(['submental'])
+    raw_file.drop_channels(['rectal'])
+
+    return raw_file, annotations_local
 
 
 def crop_annotations(annotations, raw):
@@ -85,44 +91,54 @@ def crop_annotations(annotations, raw):
     raw.set_annotations(annotations)
 
 
-def create_events(raw_local):
-    events_local, _ = mne.events_from_annotations(raw_local, event_id=annotation_event_id, chunk_duration=30.0)
-    return events_local
+def create_events(raw_file):
+    # Normally, mne.events_from_annotations returns a tuple so the underscore in "events, _" ensures that only the events is saved to the variable
+    events, _ = mne.events_from_annotations(raw_file, event_id=annotation_event_id, chunk_duration=30.0)
+    event_id = dict(awake=1, light_sleep=2, deep_sleep=3, rem=4)
+    picks = mne.pick_types(raw.info, eeg=True, stim=False, exclude='bads')
 
-def create_epochs(raw_local):
-    return ""
+    return events, event_id, picks
+
+
+
+def create_epochs(raw_file, events, event_id, picks):
+
+    epochs = mne.Epochs(
+        raw_file,
+        events = events,
+        event_id = event_id,
+        tmin = 0.5, # TEMPORARY CHANGE
+        tmax = 30.0,
+        proj = True,
+        picks = picks,
+        baseline = None,
+        preload = True,
+    )
+
+    epochs_train = epochs.copy().crop() # figure out when to crop
+    labels = epochs.events[0:len(epochs), -1]
+    print(labels)
+
+
 
 # This is used to visualise the PSD for each stage
 def psd_plot(raw):
     plt.close("all")
-    raw.compute_psd(fmin=0.5, fmax=50).plot()
+    raw.compute_psd(fmin=0.5, fmax=30).plot()
     plt.show()
 
 
 # Main program
-raw, subject1, annotations = loading_data(0)
-crop_annotations(annotations, raw)
-events = create_events(raw)
+raw, _ = loading_data(1, 0)
+events, event_id, picks = create_events(raw)
+create_epochs(raw, events, event_id, picks)
+
+psd_plot(raw)
 
 # Plotting raw file
-raw.plot(start=60, duration=60)
-plt.show()
 
 
-# Plotting by sleep stage
-plot = mne.viz.plot_events(
-    events,
-    event_id=event_id,
-    sfreq=raw.info["sfreq"],
-    first_samp=events[0, 0],
-)
 
-
-# Lowest delta is 0.5 and highest sigma is 30.5
-raw.filter(l_freq=0.5, h_freq=30.5, fir_design="firwin", skip_by_annotation="edge")
-
-
-# NEED to customise figure via matplot commands
 
 
 # Saving the model
