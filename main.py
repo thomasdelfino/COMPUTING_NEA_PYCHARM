@@ -56,26 +56,26 @@ frequency_bands = {
 
 # Subroutines
 
-def loading_data(subject_num, subject_index):
-    [subject_files] = fetch_data(subjects=[subject_num], recording=[2])  # Not sure what recording=[1] means
+def loading_data(subject_num, subject_index, recording_num):
+    # Each participant has a subject number, and recording
+    # Whats the difference between the subject number and index?
+
+    [subject_files] = fetch_data(subjects=[subject_num], recording=[recording_num]) # Recording represents the night / session that is being loaded
 
     raw_file = mne.io.read_raw_edf(
-        subject_files[subject_index],  # 0th file, can change
+        subject_files[subject_index],
         stim_channel="Event marker",
         infer_types=True,
+        exclude=['horizontal', 'oro-nasal', 'submental', 'rectal'], # Not all channels can be available to the user e.g. rectal temperature
         preload=True,
         verbose="error"
-    )
+        )
+
+    raw_file.filter(l_freq=0.5, h_freq=30.0, method="iir") # Basic preprocessing
 
     # Reading and setting the annotations
-    annotations_local = mne.read_annotations(subject_files[1])
+    annotations_local = mne.read_annotations(subject_files[recording_num])
     raw_file.set_annotations(annotations_local)
-
-    # Not all channels can be available to the user e.g. rectal temperature
-    raw_file.drop_channels(['horizontal'])
-    raw_file.drop_channels(['oro-nasal'])
-    raw_file.drop_channels(['submental'])
-    raw_file.drop_channels(['rectal'])
 
     return raw_file, annotations_local
 
@@ -129,24 +129,13 @@ def psd_plot(raw):
 
 
 # Main program
-raw, _ = loading_data(1, 0)
+raw, _ = loading_data(1, 0, 1)
 events, event_id, picks = create_events(raw)
 create_epochs(raw, events, event_id, picks)
 
-psd_plot(raw)
 
 # Plotting raw file
 
-
-
-
-
-# Saving the model
-""" 
-import joblib
-
-joblib.dump(model, 'sleep_eeg_model.joblib')
-"""
 
 
 # INFORMATION
