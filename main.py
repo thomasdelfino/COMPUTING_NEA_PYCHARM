@@ -54,16 +54,20 @@ frequency_bands = {
     "sigma": [15.5, 30.5],
 }
 
+# tmin and tmax represent when epochs should start / finish
+tmin = 0.0
+tmax = 30.0 # By default, I am setting tmax as 30.0 but this may need to be changed to take into account the total size of files as it may not be cleanly divisible by 30, which might create problems
+
 # Subroutines
 
-def loading_data(subject_num, subject_index, recording_num):
-    # Each participant has a subject number, and recording
-    # Whats the difference between the subject number and index?
+def load_data(subject_index, night):
+    # Each participant has a subject number, and recording_number (indicating which night is shown)
+    # Subject number indicates which subject out of the 74 is selected
 
-    [subject_files] = fetch_data(subjects=[subject_num], recording=[recording_num]) # Recording represents the night / session that is being loaded
+    [subject_files] = fetch_data(subjects=[subject_index], recording=[night]) # Recording represents the night / session that is being loaded, 1st or 2nd
 
     raw_file = mne.io.read_raw_edf(
-        subject_files[subject_index],
+        subject_files[0], # 0 for the raw file, 1 for the histogram of the participant
         stim_channel="Event marker",
         infer_types=True,
         exclude=['horizontal', 'oro-nasal', 'submental', 'rectal'], # Not all channels can be available to the user e.g. rectal temperature
@@ -71,13 +75,15 @@ def loading_data(subject_num, subject_index, recording_num):
         verbose="error"
         )
 
+    # Remove frequencies <0.5 and >30.0 as these are likely not from the participant / will not help the model
     raw_file.filter(l_freq=0.5, h_freq=30.0, method="iir") # Basic preprocessing
 
     # Reading and setting the annotations
-    annotations_local = mne.read_annotations(subject_files[recording_num])
-    raw_file.set_annotations(annotations_local)
+    annotations = mne.read_annotations(subject_files[night])
+    raw_file.set_annotations(annotations)
 
-    return raw_file, annotations_local
+
+    return raw_file, annotations
 
 
 def crop_annotations(annotations, raw):
@@ -91,51 +97,89 @@ def crop_annotations(annotations, raw):
     raw.set_annotations(annotations)
 
 
-def create_events(raw_file):
+def create_events(raw_file_local):
     # Normally, mne.events_from_annotations returns a tuple so the underscore in "events, _" ensures that only the events is saved to the variable
-    events, _ = mne.events_from_annotations(raw_file, event_id=annotation_event_id, chunk_duration=30.0)
-    event_id = dict(awake=1, light_sleep=2, deep_sleep=3, rem=4)
-    picks = mne.pick_types(raw.info, eeg=True, stim=False, exclude='bads')
+    events_local, _ = mne.events_from_annotations(raw_file_local, event_id=annotation_event_id, chunk_duration=30.0)
 
-    return events, event_id, picks
+    # Create a dictionary linking the number of events to a label
+    event_id_local = dict(awake=1, light_sleep=2, deep_sleep=3, rem=4)
+
+    return events_local, event_id_local
 
 
+def create_epochs(raw_file_local, events_local, event_id_local):
 
-def create_epochs(raw_file, events, event_id, picks):
-
-    epochs = mne.Epochs(
-        raw_file,
-        events = events,
-        event_id = event_id,
-        tmin = 0.5, # TEMPORARY CHANGE
-        tmax = 30.0,
+    epochs_local = mne.Epochs(
+        raw_file_local,
+        events = events_local,
+        event_id = event_id_local,
+        tmin = tmin, # Set as 0.0
+        tmax = tmax, # Set as 30.0
         proj = True,
-        picks = picks,
+        picks=['Fpz-Cz', 'Pz-Oz'],  # Event marker not included otherwise the model may be fed the true sleep stage
         baseline = None,
         preload = True,
     )
 
-    epochs_train = epochs.copy().crop() # figure out when to crop
-    labels = epochs.events[0:len(epochs), -1]
-    print(labels)
+
+    epochs_train_local = epochs_local.copy().crop(tmin=0.0, tmax=30.0) # Would need to find out if 0 - 30 is an appropriate crop, and no crop may be needed at all
+
+    labels_local = epochs_local.events[0:len(epochs_local), -1]
+    print("Event labels array:")
+    print(labels_local)
+
+    return epochs_local, epochs_train_local, labels_local
 
 
 
 # This is used to visualise the PSD for each stage
-def psd_plot(raw):
+def psd_plot(samples, samples_name):
+    print(samples)
+
     plt.close("all")
-    raw.compute_psd(fmin=0.5, fmax=30).plot()
+
+    psd_of_samples = samples.compute_psd(method='multitaper', fmin=0.5, fmax=50)
+    psd_of_samples.plot(show=False, spatial_colors=False)
+
+    #psd_of_samples.title(samples_name)
+    #psd_of_samples.xlim(0, 50)
+    #psd_of_samples.ylim(-40, 25)
+
+
     plt.show()
 
 
 # Main program
-raw, _ = loading_data(1, 0, 1)
-events, event_id, picks = create_events(raw)
-create_epochs(raw, events, event_id, picks)
+raw_file, annotations = load_data(0, 1)
+print("Raw file loaded")
 
+# Insert crop annotations subroutine
 
-# Plotting raw file
+events, event_id = create_events(raw_file)
+print("Events created from raw file")
 
+epochs, epochs_train, labels = create_epochs(raw_file, events, event_id)
+print("Epochs created")
+
+# Plotting epochs
+
+psd_of_epochs = epochs.compute_psd(method='multitaper', fmin=0.5, fmax=30.0)
+psd_of_epochs.plot()
+print(psd_of_epochs)
+
+psds, psd_frequencies = psd_of_epochs.get_data(return_freqs=True)
+print("Shape of PSDs")
+print("(30 second sections, channels, frequencies)")
+print(psds.shape)
+
+print("Shape of PSDs frequencies")
+print(psd_frequencies.shape)
+
+psd_plot(epochs["deep_sleep"].average(), "Deep sleep")
+
+psd_plot(epochs["awake"].average(), "Awake")
+psd_plot(epochs["rem"].average(), "REM")
+psd_plot(epochs["light_sleep"].average(), "Light sleep")
 
 
 # INFORMATION
