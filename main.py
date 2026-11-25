@@ -63,28 +63,34 @@ tmax = 30.0 # By default, I am setting tmax as 30.0 but this may need to be chan
 def load_data(subject_index, night):
     # Each participant has a subject number, and recording_number (indicating which night is shown)
     # Subject number indicates which subject out of the 74 is selected
+    # All variables have the suffix local so they don't shadow global variable
 
     [subject_files] = fetch_data(subjects=[subject_index], recording=[night]) # Recording represents the night / session that is being loaded, 1st or 2nd
 
-    raw_file = mne.io.read_raw_edf(
+    raw_file_local = mne.io.read_raw_edf(
         subject_files[0], # 0 for the raw file, 1 for the histogram of the participant
         stim_channel="Event marker",
         infer_types=True,
-        exclude=['horizontal', 'oro-nasal', 'submental', 'rectal'], # Not all channels can be available to the user e.g. rectal temperature
+        exclude=['horizontal', 'oro-nasal', 'submental', 'rectal'], # Not all channels in the data can be available to the user e.g. rectal temperature
         preload=True,
         verbose="error"
         )
 
     # Remove frequencies <0.5 and >30.0 as these are likely not from the participant / will not help the model
-    raw_file.filter(l_freq=0.5, h_freq=30.0, method="iir") # Basic preprocessing
+    raw_file_local.filter(l_freq=0.5, h_freq=30.0, method="iir") # Basic preprocessing
 
     # Reading and setting the annotations
-    annotations = mne.read_annotations(subject_files[night])
-    raw_file.set_annotations(annotations)
+    annotations_local = mne.read_annotations(subject_files[night])
+
+    # Crop annotations subroutine
+    sleep_start = annotations_local[1]["onset"] - 30 * 4 * 60
+    sleep_end = annotations_local[-2]["onset"] + 30 * 4 * 60
+    annotations_local.crop(sleep_start, sleep_end)
+
+    raw_file_local.set_annotations(annotations_local)
 
 
-    return raw_file, annotations
-
+    return raw_file_local
 
 def crop_annotations(annotations, raw):
     # Cropping 30 minutes before and after sleeping
@@ -150,7 +156,7 @@ def psd_plot(samples, samples_name):
 
 
 # Main program
-raw_file, annotations = load_data(0, 1)
+raw_file= load_data(1, 1)
 print("Raw file loaded")
 
 # Insert crop annotations subroutine
@@ -161,6 +167,10 @@ print("Events created from raw file")
 epochs, epochs_train, labels = create_epochs(raw_file, events, event_id)
 print("Epochs created")
 
+
+raw_file.info
+
+"""
 # Plotting epochs
 
 psd_of_epochs = epochs.compute_psd(method='multitaper', fmin=0.5, fmax=30.0)
@@ -184,3 +194,4 @@ psd_plot(epochs["light_sleep"].average(), "Light sleep")
 
 # INFORMATION
 # Code copied from PycharmCE as it is an old version
+"""
